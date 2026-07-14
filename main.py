@@ -1,10 +1,11 @@
-from typing import Annotated, list
+from typing import Annotated, List
 from dotenv import load_dotenv
 from langgraph.graph import StateGraph, START, END
 from langgraph.graph.message import add_messages
 from langchain_groq import ChatGroq
 from typing_extensions import TypedDict
 from pydantic import BaseModel, Field
+from web_search_service import serp_search
 
 load_dotenv()
 
@@ -25,39 +26,72 @@ class State(TypedDict):
   
   
 def google_search(state: State):
-  return
+  user_question = state.get("user_question", "")
+  print(f"Searching Google for: {user_question}")
+  
+  google_results = serp_search(user_question, engine="google")
+  
+  return {
+    "google_results": google_results
+  }
   
   
 def bing_search(state: State):
-  return
+  user_question = state.get("user_question", "")
+  print(f"Searching Bing for: {user_question}")
+  
+  bing_results = serp_search(user_question, engine="bing")
+  
+  return {
+    "bing_results": bing_results
+  }
   
   
 def reddit_search(state: State):
-  return
+  user_question = state.get("user_question", "")
+  print(f"Searching Reddit for: {user_question}")
+  
+  reddit_results = []
+  
+  return {
+    "reddit_results": reddit_results
+  }
   
   
 def analyze_reddit_post(state: State):
-  return
+  return {
+    "selected_reddit_urls": []
+  }
   
   
 def retrieve_reddit_post(state: State):
-  return
+  return {
+    "reddit_post_data": []
+  }
   
   
 def analyze_google_results(state: State):
-  return
+  return {
+    "google_analysis": ""
+  }
   
   
 def analyze_bing_results(state: State):
-  return
+  return {
+    "bing_analysis": ""
+  }
   
   
 def analyze_reddit_results(state: State):
-  return
+  return {
+    "reddit_analysis": ""
+  }
   
   
 def synthesized_analysis(state: State):
-  return
+  return {
+    "final_answer": ""
+  }
 
 
 graph = StateGraph(State)
