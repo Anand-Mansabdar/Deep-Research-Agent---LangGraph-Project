@@ -112,3 +112,48 @@ def reddit_search_api(keyword, date="All time", sort_by="Hot", num_of_posts=75):
     "parsed_posts": parsed_data,
     "total_found": len(parsed_data)
   } 
+  
+  
+def reddit_post_retrieval(urls, days_back=10, load_all_replies=False, comment_limit=""):
+  if not urls:
+    return None
+  
+  trigger_url = "https://api.brightdata.com/datasets/v3/trigger"
+  
+  params = {
+    "dataset_id": "gd_lvzdpsdlw09j6t702",
+    "include_errors": "true"
+  }
+  
+  data = [
+    {
+      "url": url,
+      "days_back": days_back,
+      "load_all_replies": load_all_replies,
+      "comment_limit": comment_limit
+    } for url in urls
+  ]
+  
+  raw_data = _trigger_and_download_snapshot(
+    trigger_url, params, data, operation_name="reddit comments"
+  )
+  
+  if not raw_data:
+    return None
+  
+  parsed_comments = []
+  for comment in raw_data:
+    parsed_comment = {
+      "comment_id": comment.get("comment_id"),
+      "content": comment.get('content'),
+      "date": comment.get("date"),
+      "parent_comment_id": comment.get("parent_comment_id"),
+      "post_title": comment.get("post_title")
+    }
+    
+    parsed_comments.append(parsed_comment)
+    
+  return {
+    "comments": parsed_comments,
+    "total_retrieved": len(parsed_comments)
+  }
